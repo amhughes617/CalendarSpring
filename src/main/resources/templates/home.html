@@ -1,13 +1,33 @@
 <html>
 <body>
+{{^user}}
+<form action="/login" method="post">
+    <input type="text" placeholder="Enter your name" name="name">
+    <button type="submit">Submit</button>
+</form>
+{{/user}}
+
+{{#user}}
+Welcome, {{name}}!<br>
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
 <form action="/create-event" method="post">
     <input type="text" placeholder="Description" name="description" width="200">
     <input type="datetime-local" name="dateTime" value="{{now}}">
     <button type="submit">Add Event</button>
 </form>
-
+{{/user}}
 {{#events}}
-{{description}} {{dateTime}}<br>
+{{description}} {{dateTime}}
+{{#userExists}}
+<form action="/fav" method="post" style="display: inline">
+    <input type="hidden" value="{{id}}" name="id">
+    <button type="submit">Favorite</button>
+</form>
+{{/userExists}}
+<br>
 {{/events}}
+
 </body>
 </html>
