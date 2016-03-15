@@ -19,6 +19,8 @@ public class Event {
     private LocalDateTime dateTime;
     @ManyToOne
     User user;
+    @Transient
+    boolean showFavButt;
 
     public Event() {
     }
@@ -45,7 +47,23 @@ public class Event {
         return dateTime;
     }
 
+    public boolean isShowFavButt() {
+        return showFavButt;
+    }
+
+    public void setShowFavButt(boolean showFavButt) {
+        this.showFavButt = showFavButt;
+    }
+
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

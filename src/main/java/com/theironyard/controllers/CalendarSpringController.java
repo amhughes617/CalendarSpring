@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
  * Created by alexanderhughes on 3/14/16.
@@ -31,21 +33,25 @@ public class CalendarSpringController {
     @RequestMapping(path = "/", method = RequestMethod.GET)
     public String home(Model model, HttpSession session) {
         String userName = (String) session.getAttribute("userName");
-        if (userName != null) {
-            model.addAttribute("user", users.findFirstByName(userName));
-            model.addAttribute("userExists", true);
-            model.addAttribute("now", LocalDateTime.now());
-        }
-        model.addAttribute("events", events.findAllByOrderByDateTimeDesc());
+        User user = users.findFirstByName(userName);
+        List<Event> list = events.findAllByOrderByDateTimeDesc();
 
+        if (userName != null) {
+            model.addAttribute("user", user);
+            model.addAttribute("now", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+            for (Event event : list) {
+                    event.setShowFavButt(favorites.findByUserAndEvent(user, event) == null);
+            }
+        }
+        model.addAttribute("events", list);
         return "home";
     }
 
     @RequestMapping(path = "/create-event", method = RequestMethod.POST)
     public String createEvent(String description, String dateTime, HttpSession session) {
-        User user = users.findFirstByName((String)session.getAttribute("userName"));
-        if (user != null) {
-            Event event = new Event(description, LocalDateTime.parse(dateTime), user);
+        String userName = (String) session.getAttribute("userName");
+        if (userName != null) {
+            Event event = new Event(description, LocalDateTime.parse(dateTime), users.findFirstByName(userName));
             events.save(event);
         }
         return "redirect:/";
